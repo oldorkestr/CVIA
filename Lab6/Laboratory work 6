@@ -1,0 +1,85 @@
+from sklearn.datasets import fetch_openml
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
+
+mnist = fetch_openml('mnist_784')
+
+images = mnist.data
+labels = mnist.target
+
+images = normalize(images, norm='l2') 
+images_train, images_test, labels_train, labels_test =train_test_split(images, labels, test_size=0.25, random_state=17)
+
+nn = MLPClassifier(hidden_layer_sizes=(100), max_iter=20, solver='sgd',learning_rate_init=0.001, verbose=True)
+
+nn.fit(images_train, labels_train)
+
+print('Network Performance: %f' % nn.score(images_test, labels_test))
+input("Press Enter to continue...")
+
+from sklearn.datasets import fetch_openml
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
+
+
+mnist = fetch_openml('mnist_784')
+
+images = mnist.data
+labels = mnist.target
+
+images = normalize(images, norm='l2') 
+images_train, images_test, labels_train, labels_test =train_test_split(images, labels, test_size=0.25, random_state=17)
+
+nn = MLPClassifier(hidden_layer_sizes=(200), max_iter=20, solver='sgd',learning_rate_init=0.001, verbose=True)
+
+nn.fit(images_train, labels_train)
+
+
+print('Network Performance: %f' % nn.score(images_test, labels_test))
+input("Press Enter to continue...")
+
+from sklearn.datasets import fetch_openml
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
+
+print('Getting MNIST Data...')
+mnist = fetch_openml('mnist_784')
+print('MNIST Data downloaded!')
+
+images = mnist.data
+labels = mnist.target
+
+images = normalize(images, norm='l2') 
+images_train, images_test, labels_train, labels_test =train_test_split(images, labels, test_size=0.25, random_state=17)
+
+nn = MLPClassifier(hidden_layer_sizes=(100, 100, 100), max_iter=20,solver='sgd', learning_rate_init=0.005, verbose=True)
+
+# print('NN Training started...')
+nn.fit(images_train, labels_train)
+# print('NN Training completed!')
+
+print('Network Performance: %f' % nn.score(images_test, labels_test))
+input("Press Enter to continue...")
+
+import numpy as np
+from tensorflow import keras
+from keras import layers
+num_classes = 10
+input_shape = (28, 28, 1)
+
+# Load the data and split it between train and test sets
+(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+# Scale images to the [0, 1] range
+x_train = x_train.astype("float32") / 255
+x_test = x_test.astype("float32") / 255
+# Make sure images have shape (28, 28, 1)
+x_train = np.expand_dims(x_train, -1)
+x_test = np.expand_dims(x_test, -1)
+print("x_train shape:", x_train.shape)
+print(x_train.shape[0], "train samples")
+print(x_test.shape[0], "test samples")
+input("Press Enter to continue...")

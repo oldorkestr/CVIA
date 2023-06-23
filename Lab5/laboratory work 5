@@ -1,0 +1,198 @@
+from sklearn import datasets, metrics
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+mnist = datasets.load_digits()
+
+img_tuple = list(zip(mnist.images, mnist.target))
+
+images = mnist.images
+
+data_size = len(images)
+
+#Preprocessing images
+images = images.reshape(len(images), -1)
+labels = mnist.target
+
+
+fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(10, 5))
+for i, ax in enumerate(axes.flat):
+    ax.imshow(mnist.images[i], cmap='gray')
+    ax.set_title("Label: {}".format(mnist.target[i]))
+plt.show()
+input("Press Enter to continue...")
+
+
+#Initialize Logistic Regression
+LR_classifier = LogisticRegression(C=0.01, penalty='l2', tol=0.01)
+#Training the data on only 75% of the dataset. Rest of the 25% will be used in testing the Logistic Regression
+LR_classifier.fit(images[:int((data_size / 4) * 3)], labels[:int((data_size / 4) * 3)])
+
+#Testing the data
+predictions = LR_classifier.predict(images[int((data_size / 4)):])
+target = labels[int((data_size/4)):]
+
+
+#Print the performance report of the Logistic Regression model that we learnt
+print("Performance Report: \n %s \n" % (metrics.classification_report(target, predictions)))
+
+import numpy as np
+from sklearn import datasets, metrics
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from skimage import io, color, feature, transform
+
+# Load the digits dataset
+mnist = datasets.load_digits()
+
+# Preprocess the data
+images = mnist.images.reshape(len(mnist.images), -1)
+labels = mnist.target
+
+# Check for and remove any rows containing NaN values
+nan_rows = np.isnan(images).any(axis=1)
+images = images[~nan_rows]
+labels = labels[~nan_rows]
+
+# Initialize and train the logistic regression model
+LR_classifier = LogisticRegression(C=0.01, penalty='l2', tol=0.01)
+LR_classifier.fit(images[:int(len(images) * 0.75)], labels[:int(len(images) * 0.75)])
+
+# Load the custom image
+digit_img = io.imread('/Users/orestonyshchenko/Desktop/University/CVIA/Lab5/png-clipart-3-3.png', as_gray=True)
+
+# Resize and run edge detection on the image
+digit_img = transform.resize(digit_img, (8, 8), mode="wrap")
+digit_edge = feature.canny(digit_img, sigma=5)
+digit_edge = digit_edge.flatten().reshape(1, -1)
+
+# Check for and remove any NaN values in the edge data
+if np.isnan(digit_edge).any():
+    digit_edge = np.nan_to_num(digit_edge)
+
+# Make a prediction using the logistic regression model
+prediction = LR_classifier.predict(digit_edge)
+print(prediction)
+input("Press Enter to continue...")
+
+
+from sklearn import datasets, metrics, svm
+
+mnist = datasets.load_digits()
+
+images = mnist.images
+
+data_size = len(images)
+
+#Preprocessing images
+images = images.reshape(len(images), -1)
+labels = mnist.target
+
+#Initialize Support Vector Machine
+SVM_classifier = svm.SVC(gamma=0.001)
+
+SVM_classifier.fit(images[:int((data_size / 4) * 3)], labels[:int((data_size / 4) * 3)])
+
+#Testing the data
+predictions = SVM_classifier.predict(images[int((data_size / 4)):])
+target = labels[int((data_size/4)):]
+
+
+print("Performance Report: \n %s \n" % (metrics.classification_report(target, predictions)))
+input("Press Enter to continue...")
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import offsetbox
+from sklearn import manifold, datasets, decomposition
+
+digits = datasets.load_digits(n_class=6)
+X = digits.data
+y = digits.target
+n_samples, n_features = X.shape
+n_neighbors = 30
+
+
+#----------------------------------------------------------------------
+# Scale and visualize the embedding vectors
+def plot_embedding(X, title=None):
+    x_min, x_max = np.min(X, 0), np.max(X, 0)
+    X = (X - x_min) / (x_max - x_min)
+
+    plt.figure()
+    ax = plt.subplot(111)
+    
+    for i in range(X.shape[0]):
+        plt.text(X[i, 0], X[i, 1], str(digits.target[i]),
+                 color=plt.cm.Set1(y[i] / 10.),
+                 fontdict={'weight': 'bold', 'size': 9})
+   
+   
+    plt.xticks([]), plt.yticks([])
+    if title is not None:
+        plt.title(title)
+
+
+#----------------------------------------------------------------------
+# Plot images of the digits
+n_img_per_row = 20
+img = np.zeros((10 * n_img_per_row, 10 * n_img_per_row))
+for i in range(n_img_per_row):
+    ix = 10 * i + 1
+    for j in range(n_img_per_row):
+        iy = 10 * j + 1
+        img[ix:ix + 8, iy:iy + 8] = X[i * n_img_per_row + j].reshape((8, 8))
+
+plt.imshow(img, cmap=plt.cm.binary)
+plt.xticks([])
+plt.yticks([])
+plt.title('A selection from the 64-dimensional digits dataset')
+
+#----------------------------------------------------------------------
+# Projection on to the first 2 principal components
+
+print("Computing PCA projection")
+X_pca = decomposition.TruncatedSVD(n_components=2).fit_transform(X)
+plot_embedding(X_pca)
+
+#----------------------------------------------------------------------
+# t-SNE embedding of the digits dataset
+print("Computing t-SNE embedding")
+tsne = manifold.TSNE(n_components=2, init='pca', random_state=0)
+X_tsne = tsne.fit_transform(X)
+
+plot_embedding(X_tsne)
+plt.show()
+input("Press Enter to continue...")
+
+
+from sklearn import datasets, metrics
+from sklearn.cluster import KMeans
+
+mnist = datasets.load_digits()
+
+images = mnist.images
+
+data_size = len(images)
+
+#Preprocessing images
+images = images.reshape(len(images), -1)
+labels = mnist.target
+
+
+clustering = KMeans(n_clusters=10, init='k-means++', n_init=10)
+
+#Training the data on only 75% of the dataset. Rest of the 25% will be used in testing the KMeans Clustering
+clustering.fit(images[:int((data_size / 4) * 3)])
+
+#Print the centers of the different clusters
+print(clustering.labels_)
+
+#Testing the data
+predictions = clustering.predict(images[int((data_size / 4)):])
+target = labels[int((data_size/4)):]
+
+
+print("Performance Report: \n %s \n" % (metrics.classification_report(target, predictions)))
+input("Press Enter to continue...")
